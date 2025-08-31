@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kiss Ádám EV - Díjak 2025</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+ 
+
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background-color: #2c3e50;
+      color: #ffffff;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 15px;
+    }
+
+    .header-box {
+      display: inline-block;
+      background-color: #1abc9c;
+      padding: 15px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,1);
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 15px;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #4fc3c9;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+
+    h3 {
+      color: #4fc3c9;
+      text-align: center;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    /* --- CARD STÍLUS + ANIMÁCIÓ --- */
+    .card {
+      background-color: #34495e;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      font-size: 16px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1.0s ease-out;
+    }
+
+    .card.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 22px;
+    }
+
+    .card ul {
+      padding-left: 20px;
+      margin: 0;
+      text-align: left;
+    }
+
+    .card p {
+      text-align: left;
+    }
+
+    .card.revolut p {
+      text-align: center;
+    }
+
+    .highlight {
+      color: #7bed9f;
+      font-weight: bold;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #cccccc;
+      margin-top: 15px;
+    }
+
+    footer {
+      background-color: #345f61;
+      text-align: center;
+      padding: 15px;
+      font-size: 12px;
+      margin-top: auto;
+    }
+
+    .revolut-button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .revolut-button {
+      display:inline-flex;
+      align-items: center;
+      padding:12px 30px;
+      background-color:#000000;
+      color:#ffffff;
+      text-decoration:none;
+      border-radius:6px;
+      font-weight:bold;
+      font-family:Arial, sans-serif;
+      font-size:16px;
+    }
+
+    .revolut-button img {
+      margin-right:16px;
+      vertical-align:middle;
+    }
+
+    .service-icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: #1abc9c;
+    }
+
+    .aszf {
+      margin-top: 50px;
+      font-size: 13px;
+      color: #cccccc;
+      background-color: #22313f;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .aszf h3 {
+      color: #ffffff;
+      margin-top: 0;
+      font-size: 18px;
+      text-align: left;
+    }
+
+    .aszf ul {
+      padding-left: 20px;
+      text-align: left;
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* --- FEL AZ OLDAL TETEJÉRE GOMB --- */
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 100;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: background-color 0.3s;
+    }
+
+    #scrollTopBtn:hover {
+      background-color: #16a085;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-box">
+      Kiss Ádám EV – Könyvelés
+    </div>
+  </header>
+
+  <main>
+    <h2>Szolgáltatások</h2>
+
+    <div class="cards">
+      <div class="card">
+        <div class="service-icon">📘</div>
+        <h3>Könyvelés</h3>
+        <p>Alanyi adómentes vállalkozásod teljes körű könyvelését 100% online végzem, így nincs szükség személyes találkozásra.</p>
+      </div>
+
+      <div class="card">
+        <div class="service-icon">📄</div>
+        <h3>Bevallások</h3>
+        <p>Havi / negyedéves / éves bevallások precíz és időben történő elkészítése.</p>
+      </div>
+
+      <div class="card">
+        <div class="service-icon">🔔</div>
+        <h3>Tájékoztatás</h3>
+        <p>Mindig frissen informállak az új esetleges adó változásokról, valamint az új adókötelezettségekről.</p>
+      </div>
+    </div>
+    <p class="note">
+      • Ezen szolgáltatások könyvelési díj megfizetése ellenében vehetőek igénybe.
+    </p>
+
+    <br><br>
+    <h2>Díjak – 2025</h2>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Átalányadózás</h3>
+        <ul>
+          <li>Főfoglalkozású: <span class="highlight">10 000 Ft / hó</span></li>
+          <li>Mellékfoglalkozású: <span class="highlight">7 500 Ft / hó</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>KATA</h3>
+        <ul>
+          <li>Fő- és mellékfoglalkozású: <span class="highlight">7 500 Ft / hó</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Vállalkozói SZJA</h3>
+        <ul>
+          <li>Főfoglalkozású: <span class="highlight">14 000 Ft / hó</span></li>
+          <li>Mellékfoglalkozású: <span class="highlight">12 000 Ft / hó</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Bevallások és nyomtatványok</h3>
+        <ul>
+          <li>Utólagos bevallás: <span class="highlight">15 000 Ft / db</span></li>
+          <li>Könyvelési díj mellett: <span class="highlight">10 000 Ft / db kedvezmény</span></li>
+          <li>Esetleges NAV ügyintézés: <span class="highlight"> 2 500 Ft / óra</span> </li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Vállalkozás indítása, szüneteltetése</h3>
+        <ul>
+          <li>Díj: <span class="highlight">5 000 Ft / alkalom</span></li>
+          <li>Tartalmazza a járulékbejelentést</li>
+          <li>Könyvelési díj mellett: <span class="highlight">100% kedvezmény</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Kedvezmények</h3>
+        <ul>
+          <li>Új ügyfeleknek az első havi díjból <span class="highlight">50% kedvezmény</span></li>
+          <li>Ajánlás után a következő havi díjból <span class="highlight">50% kedvezmény</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="note">
+      • A könyvelési díj tartalmazza a teljes körű könyvelést (saját fejlesztésű szoftverben), adótanácsadást, a bevallások elkészítését, az ügyfél kérdéseinek megválaszolását, jogszabályok változásának figyelését, adóbefizetésről kapcsolatos előrejelzéseket, valamint az aktuális hírek közlését.<br>
+      • Az új ügyfél kedvezmény csak azon ügyfelek számára érvényes, akiknek nem kellett utólagos adóbevallást készíteni az ügyfél felvételét követően önhiba vagy korábbi könyvelői hiba miatt.
+    </p>
+  
+    <h2>Egyéni vállalkozás adatok</h2>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Fizetési adatok - Átutalás</h3>
+        <p>
+          Név: <strong style="color:#ffffff;">Kiss Ádám</strong><br>
+          Bankszámlaszám: <strong style="color:#ffffff;">11773487-01733617</strong><br>
+          Közlemény: <strong style="color:#ffffff;">számla sorszáma</strong>
+        </p>
+      </div>
+
+      <div class="card revolut">
+        <h3>Fizetési adatok - Revolut</h3>
+        <p>
+          Megjegyzés: <strong style="color:#ffffff;">számla sorszáma</strong>
+        </p>
+        <div class="revolut-button-container">
+          <a href="https://revolut.me/kiss01adam" class="revolut-button">
+            <img src="https://play-lh.googleusercontent.com/9Agn2TZHIyOR4GGB4LcOU4VXwE2OcK47qwGY8XPZXz4u55ehNfpGuEBeNq_cbvH0z5A=s188" 
+                 alt="Revolut" width="20" height="20">
+            Revolut Fizetés
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Egyéni vállalkozás</h3>
+        <p>
+          Adószám: <strong style="color:#ffffff;">90429633-1-39</strong><br>
+          Nyilvántartási szám: <strong style="color:#ffffff;">59620844</strong><br>
+          E-mail cím: <strong style="color:#ffffff;">kiss01adam77@gmail.com</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- ÁSZF blokk -->
+		<div class="aszf">
+			<h3>Általános Szerződési Feltételek (ÁSZF)</h3>
+				
+			<ul>
+				<li>A könyvelési szolgáltatás kizárólag az ügyfél által határidőben, teljes körűen és valós adatokkal átadott információkra terjed ki.</li>
+				<li>Az ügyfél felelőssége, hogy a jogviszonyában bekövetkező változásokról időben tájékoztassa a könyvelőt.</li>
+				<li>A díjak minden esetben számla kiállítását követően, a megadott fizetési határidőn belül fizetendők. Amennyiben a fizetés felszólítás ellenére sem történik meg, a számla végösszegén felül késedelmi kamat is felszámítható.</li>
+				<li>Amennyiben a befizetés közleménye vagy megjegyzése hiányzik, és emiatt a fizetés nem azonosítható, a könyvelő nem köteles azt teljesített fizetésként elfogadni.</li>
+				<li>A könyvelő az ügyfél adatait bizalmasan kezeli, és harmadik fél részére kizárólag törvényi kötelezettség teljesítése vagy az ügyfél kifejezett hozzájárulása esetén adja ki. Ide tartoznak különösen az adó- és járulékbevallásokban felhasznált személyes adatok, amelyek jogszabályi kötelezettség alapján a NAV felé kerülnek továbbításra.</li>
+				<li>A könyvelő felelőssége kizárólag a hatályos jogszabályoknak megfelelő könyvelésre terjed ki. Az ügyfél által elhallgatott, hiányosan vagy késve átadott adatokból eredő problémákért a könyvelő felelősséget nem vállal.</li>
+				<li>
+				Amennyiben a könyvelő hibájából egy bevallás hibásan kerül benyújtásra, és ez az ügyfél számára anyagi kárt okoz, a könyvelő a kárt megtéríti. 
+				A kártérítés történhet a veszteség összegének átutalásával, illetve – felek közötti megállapodás alapján – ingyenes könyvelési szolgáltatás nyújtásával.
+				</li>
+				<li>A szerződés bármely fél által, írásban, 30 napos felmondási idővel megszüntethető, a felmondás a hónap végére esedékes.</li>
+			</ul>
+		<p>Az ügyfél a könyvelési megbízás elfogadásával és a könyvelő (Kiss Ádám, Adóazonosító jel: 8507030831) meghatalmazásával kijelenti, hogy az ÁSZF-ben foglaltakat elolvasta és elfogadja.</p>
+	</div>
+  </main>
+
+  <footer>
+    © 2025 Kiss Ádám EV – Minden jog fenntartva
+  </footer>
+
+  <!-- FEL AZ OLDAL TETEJÉRE GOMB -->
+  <button id="scrollTopBtn" title="Fel az oldal tetejére">↑</button>
+
+  <script>
+    const scrollBtn = document.getElementById("scrollTopBtn");
+
+    window.onscroll = function() {
+      if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        scrollBtn.style.display = "block";
+      } else {
+        scrollBtn.style.display = "none";
+      }
+      revealCards(); // görgetéskor is ellenőrzi a láthatóságot
+    };
+
+    scrollBtn.addEventListener("click", function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // --- CARD ANIMÁCIÓ ---
+    const cards = document.querySelectorAll('.card');
+
+    function revealCards() {
+      const windowHeight = window.innerHeight;
+      cards.forEach(card => {
+        const cardTop = card.getBoundingClientRect().top;
+        if (cardTop < windowHeight - 50) {
+          card.classList.add('show');
+        }
+      });
+    }
+
+    // Betöltéskor is animál
+    window.addEventListener('load', revealCards);
+  </script>
+</body>
+</html>
