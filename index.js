@@ -52,3 +52,74 @@ const scrollBtn = document.getElementById("scrollTopBtn");
         emailLink.querySelector('strong').textContent = email;
       }
     });
+
+    // Navigációs menü működése
+const navToggle = document.querySelector('.nav-toggle');
+const navMenu = document.querySelector('.main-nav ul');
+
+if (navToggle && navMenu) {
+  navToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('open');
+    navToggle.classList.toggle('open');
+  });
+}
+
+// Aktív menüpont beállítása görgetéskor
+const sections = document.querySelectorAll('section, .comparison-section, .faq-container');
+const navLinks = document.querySelectorAll('.main-nav a');
+
+function setActiveNavLink() {
+  let currentSection = '';
+  
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.offsetHeight;
+    
+    if (window.scrollY >= (sectionTop - 100)) {
+      currentSection = section.getAttribute('id');
+    }
+  });
+  
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href').substring(1) === currentSection) {
+      link.classList.add('active');
+    }
+  });
+}
+
+// Görgetés esemény figyelése
+window.addEventListener('scroll', setActiveNavLink);
+
+// Menü bezárása kattintáskor (mobil)
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 900) {
+      navMenu.classList.remove('open');
+      navToggle.classList.remove('open');
+    }
+  });
+});
+
+// Header magasság dinamikus beállítása
+function adjustHeaderHeight() {
+  const header = document.querySelector('header');
+  const headerContent = document.querySelector('.header-content');
+  const nav = document.querySelector('.main-nav');
+  
+  if (header && headerContent && nav) {
+    const contentHeight = headerContent.offsetHeight;
+    const navHeight = nav.offsetHeight;
+    const minHeight = contentHeight + navHeight + 100; // 100px extra tér
+    
+    header.style.minHeight = minHeight + 'px';
+  }
+}
+
+// Oldal betöltése és átméretezés események
+window.addEventListener('load', () => {
+  adjustHeaderHeight();
+  revealCards();
+});
+
+window.addEventListener('resize', adjustHeaderHeight);
