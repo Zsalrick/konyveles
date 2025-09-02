@@ -75,6 +75,14 @@ header:before {
   border: 2px solid var(--secondary);
 }
 
+.header-content .page-main-title {
+  font-size: 2.5em; /* Kisebb, mint a fő logó, de nagyobb, mint a tagline */
+  color: #FFFFFF; /* Fehér szín */
+  margin-bottom: 10px;
+  font-weight: 700; /* Vastagabb betűtípus */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Enyhe árnyék a kiemelésért */
+}
+
 .tagline {
   font-size: 20px;
   color: var(--text-light);
@@ -228,18 +236,26 @@ h3 {
   color: var(--secondary);
 }
 
-.cta-container {
+.cta-container-contect {
   text-align: center;
   margin: 50px 0;
   padding: 40px;
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 25%, var(--secondary) 100%);
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+.cta-container-courier {
+  text-align: center;
+  margin: 50px 0;
+  padding: 40px;
+  background: linear-gradient(135deg, var(--primary-dark) 10%, #0d876f 100%);
   border-radius: 12px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.15);
 }
 
 .cta-button {
   display: inline-block;
-  background-color: var(--secondary);
+  background-color: var(--dark-bg);
   color: white;
   padding: 16px 45px;
   border-radius: 8px;
@@ -254,9 +270,9 @@ h3 {
 }
 
 .cta-button:hover {
-  background-color: #16a085;
+  background-color: linear-gradient(135deg, #15a789 10%, var(--primary-dark) 100%);;
   transform: translateY(-3px);
-  box-shadow: 0 7px 14px rgba(0,0,0,0.2);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.581);
 }
 
 footer {
@@ -623,6 +639,10 @@ section[id],
     visibility: hidden;
     transition: opacity 0.5s ease;
   }
+
+  .header-content .page-main-title {
+    font-size: 2em;
+  }
   
   .main-nav.scrolled .header-logo {
     opacity: 1;
@@ -702,6 +722,9 @@ section[id],
   .header-box {
     font-size: 22px;
     padding: 12px 20px;
+  }
+  .header-content .page-main-title {
+    font-size: 1.8em;
   }
   
   h2 {
