@@ -503,7 +503,8 @@ footer {
   top: 0;
   left: 0;
   right: 0;
-  background-color: rgba(38, 41, 43, 0.95);
+  background-color: rgba(38, 41, 43, 0.15);
+  background: linear-gradient(90deg, var(--footer-bg), var(--primary-dark), var(--footer-bg));
   z-index: 1000;
   padding: 0 20px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
