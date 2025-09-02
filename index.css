@@ -497,17 +497,24 @@ footer {
   color: white;
 }
 
+section[id],
+.comparison-section[id],
+.faq-container[id] {
+  scroll-margin-top: 100px;
+}
+
 /* --- NAVIGÁCIÓS MENÜ STÍLUSOK --- */
 .main-nav {
-  position: normal;
-  top: 0;
+  position: sticky;
+  top: 15px;
   left: 0;
   right: 0;
-  background-color: rgba(38, 41, 43, 0.15);
-  background: linear-gradient(90deg, var(--footer-bg), var(--primary-dark), var(--footer-bg));
+  background-color: rgba(38, 41, 43, 0.99);
   z-index: 1000;
   padding: 0 20px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border-radius: 15px;
+  border: 3px solid var(--footer-bg);
 }
 
 .main-nav ul {
@@ -517,6 +524,7 @@ footer {
   margin: 0;
   padding: 0;
   flex-wrap: wrap;
+  
 }
 
 .main-nav li {
@@ -537,6 +545,7 @@ footer {
 .main-nav a.active {
   color: var(--secondary);
   background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
 }
 
 .main-nav a:after {
@@ -585,13 +594,14 @@ footer {
   .main-nav {
     padding: 0;
     position: fixed;
+    border: 0px solid var(--footer-bg);
   }
   
   .main-nav ul {
     flex-direction: column;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease;
+    
   }
   
   .main-nav ul.open {

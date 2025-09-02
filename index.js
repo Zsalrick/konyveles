@@ -61,8 +61,8 @@ const navLinks = document.querySelectorAll('.main-nav a');
 
 if (navToggle && navMenu) {
   navToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('open');
     navToggle.classList.toggle('open');
+    navMenu.classList.toggle('open');
   });
 }
 
@@ -76,7 +76,7 @@ function setActiveNavLink() {
     const sectionTop = section.offsetTop;
     const sectionHeight = section.offsetHeight;
 
-    if (window.scrollY >= (sectionTop - 100)) {
+    if (window.scrollY >= (sectionTop - 200)) {
       currentSection = section.getAttribute('id');
     }
   });
