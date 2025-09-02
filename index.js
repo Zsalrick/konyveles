@@ -1,61 +1,63 @@
 const scrollBtn = document.getElementById("scrollTopBtn");
 
-    window.onscroll = function() {
-      if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-        scrollBtn.style.display = "block";
-      } else {
-        scrollBtn.style.display = "none";
-      }
-      revealCards(); // görgetéskor is ellenőrzi a láthatóságot
-    };
+window.onscroll = function() {
+  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+    scrollBtn.style.display = "block";
+  } else {
+    scrollBtn.style.display = "none";
+  }
+  revealCards();
+  setActiveNavLink(); // Ezt a funkciót is a görgetéshez kell igazítani
+};
 
-    scrollBtn.addEventListener("click", function() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+scrollBtn.addEventListener("click", function() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
-    // --- CARD ANIMÁCIÓ ---
-    const cards = document.querySelectorAll('.card');
+// --- CARD ANIMÁCIÓ ---
+const cards = document.querySelectorAll('.card');
 
-    function revealCards() {
-      const windowHeight = window.innerHeight;
-      cards.forEach(card => {
-        const cardTop = card.getBoundingClientRect().top;
-        if (cardTop < windowHeight - 50) {
-          card.classList.add('show');
-        }
-      });
+function revealCards() {
+  const windowHeight = window.innerHeight;
+  cards.forEach(card => {
+    const cardTop = card.getBoundingClientRect().top;
+    if (cardTop < windowHeight - 50) {
+      card.classList.add('show');
     }
+  });
+}
 
-    // Betöltéskor is animál
-    window.addEventListener('load', revealCards);
-    
-    // FAQ működés
-    const faqItems = document.querySelectorAll('.faq-item');
-    
-    faqItems.forEach(item => {
-      const question = item.querySelector('.faq-question');
-      const answer = item.querySelector('.faq-answer');
-      
-      question.addEventListener('click', () => {
-        item.classList.toggle('active');
-        answer.classList.toggle('open');
-      });
-    });
-    
-    // Email cím védése spamekkel szemben
-    document.addEventListener('DOMContentLoaded', function() {
-      const email = 'kiss01adam77' + '@' + 'gmail.com';
-      const emailLink = document.querySelector('a[href^="mailto:"]');
-      
-      if (emailLink) {
-        emailLink.setAttribute('href', 'mailto:' + email);
-        emailLink.querySelector('strong').textContent = email;
-      }
-    });
+// Betöltéskor is animál
+window.addEventListener('load', revealCards);
 
-    // Navigációs menü működése
+// FAQ működés
+const faqItems = document.querySelectorAll('.faq-item');
+
+faqItems.forEach(item => {
+  const question = item.querySelector('.faq-question');
+  const answer = item.querySelector('.faq-answer');
+
+  question.addEventListener('click', () => {
+    item.classList.toggle('active');
+    answer.classList.toggle('open');
+  });
+});
+
+// Email cím védése spamekkel szemben
+document.addEventListener('DOMContentLoaded', function() {
+  const email = 'kiss01adam77' + '@' + 'gmail.com';
+  const emailLink = document.querySelector('a[href^="mailto:"]');
+
+  if (emailLink) {
+    emailLink.setAttribute('href', 'mailto:' + email);
+    emailLink.querySelector('strong').textContent = email;
+  }
+});
+
+// Navigációs menü működése
 const navToggle = document.querySelector('.nav-toggle');
 const navMenu = document.querySelector('.main-nav ul');
+const navLinks = document.querySelectorAll('.main-nav a');
 
 if (navToggle && navMenu) {
   navToggle.addEventListener('click', () => {
@@ -66,20 +68,19 @@ if (navToggle && navMenu) {
 
 // Aktív menüpont beállítása görgetéskor
 const sections = document.querySelectorAll('section, .comparison-section, .faq-container');
-const navLinks = document.querySelectorAll('.main-nav a');
 
 function setActiveNavLink() {
   let currentSection = '';
-  
+
   sections.forEach(section => {
     const sectionTop = section.offsetTop;
     const sectionHeight = section.offsetHeight;
-    
+
     if (window.scrollY >= (sectionTop - 100)) {
       currentSection = section.getAttribute('id');
     }
   });
-  
+
   navLinks.forEach(link => {
     link.classList.remove('active');
     if (link.getAttribute('href').substring(1) === currentSection) {
@@ -100,26 +101,3 @@ navLinks.forEach(link => {
     }
   });
 });
-
-// Header magasság dinamikus beállítása
-function adjustHeaderHeight() {
-  const header = document.querySelector('header');
-  const headerContent = document.querySelector('.header-content');
-  const nav = document.querySelector('.main-nav');
-  
-  if (header && headerContent && nav) {
-    const contentHeight = headerContent.offsetHeight;
-    const navHeight = nav.offsetHeight;
-    const minHeight = contentHeight + navHeight + 100; // 100px extra tér
-    
-    header.style.minHeight = minHeight + 'px';
-  }
-}
-
-// Oldal betöltése és átméretezés események
-window.addEventListener('load', () => {
-  adjustHeaderHeight();
-  revealCards();
-});
-
-window.addEventListener('resize', adjustHeaderHeight);
