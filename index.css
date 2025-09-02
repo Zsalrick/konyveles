@@ -596,6 +596,7 @@ section[id],
     background-color: transparent;
     box-shadow: none;
     overflow: hidden;
+    
   }
   
   .main-nav.scrolled {
@@ -639,6 +640,9 @@ section[id],
     max-height: 500px;
     opacity: 1;
     transition: max-height 0.5s ease-in-out;
+    border: 3px solid var(--footer-bg);
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
   }
   
   .nav-toggle {
