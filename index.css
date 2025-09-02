@@ -24,8 +24,7 @@ html, body {
   height: 100%;
   margin: 0;
   scroll-behavior: smooth;
-  /* Javítás: a fix navigációs sáv miatt a görgetési pozíció igazítása */
-  scroll-padding-top: 60px; /* A navigációs sáv magassága */
+  scroll-padding-top: 60px;
 }
 
 body {
@@ -131,7 +130,6 @@ h3 {
   margin-top: 30px;
 }
 
-/* --- CARD STÍLUS + ANIMÁCIÓ --- */
 .card {
   background-color: var(--card-bg);
   border-radius: 12px;
@@ -361,7 +359,6 @@ footer {
   text-decoration: underline;
 }
 
-/* --- FEL AZ OLDAL TETEJÉRE GOMB --- */
 #scrollTopBtn {
   position: fixed;
   bottom: 30px;
@@ -385,7 +382,6 @@ footer {
   transform: translateY(-3px);
 }
 
-/* --- COMPARISON TABLE STYLES --- */
 .comparison-section {
   margin: 50px 0;
 }
@@ -438,7 +434,6 @@ footer {
   color: white;
 }
 
-/* --- FAQ STYLES --- */
 .faq-container {
   margin: 50px 0;
 }
@@ -503,7 +498,7 @@ section[id],
   scroll-margin-top: 100px;
 }
 
-/* --- NAVIGÁCIÓS MENÜ STÍLUSOK --- */
+/* Navigációs sáv: asztali nézet */
 .main-nav {
   position: sticky;
   top: 15px;
@@ -524,11 +519,10 @@ section[id],
   margin: 0;
   padding: 0;
   flex-wrap: wrap;
-  
 }
 
-.main-nav li {
-  margin: 0;
+.nav-header {
+  display: none;
 }
 
 .main-nav a {
@@ -594,22 +588,62 @@ section[id],
   .main-nav {
     padding: 0;
     position: fixed;
-    border: 0px solid var(--footer-bg);
+    top: 0;
+    left: 0;
+    right: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    overflow: hidden;
   }
   
+  .main-nav.scrolled {
+    background-color: var(--dark-bg);
+  }
+
+  .nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: transparent;
+    border-bottom: none;
+    transition: all 0.5s ease-in-out;
+  }
+  
+  .main-nav.scrolled .nav-header {
+    background-color: var(--card-bg);
+    border-bottom: 3px solid var(--secondary);
+  }
+
+  .header-logo {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease;
+  }
+  
+  .main-nav.scrolled .header-logo {
+    opacity: 1;
+    visibility: visible;
+  }
+
   .main-nav ul {
     flex-direction: column;
     max-height: 0;
     overflow: hidden;
-    
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease;
   }
   
   .main-nav ul.open {
     max-height: 500px;
+    opacity: 1;
+    transition: max-height 0.5s ease-in-out;
   }
   
   .nav-toggle {
     display: flex;
+    position: static;
   }
   
   .nav-toggle.open span:nth-child(1) {
@@ -628,6 +662,13 @@ section[id],
     text-align: center;
     padding: 12px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    /* Az elemek kezdeti pozíciója (a menü nyitása előtt) */
+    opacity: 0;
+    transform: translateY(-50px);
+    
+    /* A mozgás utáni halványodás animáció a nyitáshoz */
+    transition: transform 0.3s ease, opacity 0.3s ease 0.3s;
   }
   
   .main-nav a:last-child {
@@ -636,6 +677,14 @@ section[id],
   
   .main-nav a:after {
     display: none;
+  }
+  
+  .main-nav ul.open a {
+    opacity: 1;
+    transform: translateY(0);
+    
+    /* A halványodás előtti mozgás animáció a bezáráshoz */
+    transition: transform 0.3s ease 0.3s, opacity 0.3s ease;
   }
 }
 
@@ -664,7 +713,6 @@ section[id],
     font-size: 14px;
     white-space: wrap;
   }
-  
   
   .comparison-table {
     display: block;

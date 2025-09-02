@@ -6,15 +6,15 @@ window.onscroll = function() {
   } else {
     scrollBtn.style.display = "none";
   }
+  
   revealCards();
-  setActiveNavLink(); // Ezt a funkciót is a görgetéshez kell igazítani
+  setActiveNavLink();
 };
 
 scrollBtn.addEventListener("click", function() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-// --- CARD ANIMÁCIÓ ---
 const cards = document.querySelectorAll('.card');
 
 function revealCards() {
@@ -27,10 +27,8 @@ function revealCards() {
   });
 }
 
-// Betöltéskor is animál
 window.addEventListener('load', revealCards);
 
-// FAQ működés
 const faqItems = document.querySelectorAll('.faq-item');
 
 faqItems.forEach(item => {
@@ -43,10 +41,9 @@ faqItems.forEach(item => {
   });
 });
 
-// Email cím védése spamekkel szemben
-document.addEventListener('DOMContentLoaded', function() {
-  const email = 'kiss01adam77' + '@' + 'gmail.com';
-  const emailLink = document.querySelector('a[href^="mailto:"]');
+document.addEventListener('DOMContentLoaded', (event) => {
+  const email = 'info@kissadamev.hu';
+  const emailLink = document.querySelector('a[data-email]');
 
   if (emailLink) {
     emailLink.setAttribute('href', 'mailto:' + email);
@@ -54,19 +51,31 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Navigációs menü működése
 const navToggle = document.querySelector('.nav-toggle');
 const navMenu = document.querySelector('.main-nav ul');
 const navLinks = document.querySelectorAll('.main-nav a');
+const mainNav = document.querySelector('.main-nav');
+const header = document.querySelector('header');
+const headerEnd = header.offsetHeight - 50;
+
 
 if (navToggle && navMenu) {
   navToggle.addEventListener('click', () => {
     navToggle.classList.toggle('open');
     navMenu.classList.toggle('open');
+    
+    // Új funkció: ha a menü nyitva van, hozzáadja a .scrolled osztályt a navigációs sávhoz
+    if (navMenu.classList.contains('open')) {
+      mainNav.classList.add('scrolled');
+    } else {
+      // Ha a menü zárva van, és a felhasználó még nem görgetett le, eltávolítja a .scrolled osztályt
+      if (window.scrollY < headerEnd) {
+        mainNav.classList.remove('scrolled');
+      }
+    }
   });
 }
 
-// Aktív menüpont beállítása görgetéskor
 const sections = document.querySelectorAll('section, .comparison-section, .faq-container');
 
 function setActiveNavLink() {
@@ -89,15 +98,18 @@ function setActiveNavLink() {
   });
 }
 
-// Görgetés esemény figyelése
-window.addEventListener('scroll', setActiveNavLink);
-
-// Menü bezárása kattintáskor (mobil)
-navLinks.forEach(link => {
-  link.addEventListener('click', () => {
-    if (window.innerWidth <= 900) {
-      navMenu.classList.remove('open');
-      navToggle.classList.remove('open');
+window.addEventListener('scroll', () => {
+  if (window.matchMedia('(max-width: 900px)').matches) {
+    if (window.scrollY >= headerEnd) {
+      mainNav.classList.add('scrolled');
+    } else {
+      // Csak akkor távolítjuk el az osztályt, ha a menü zárva van
+      if (!navMenu.classList.contains('open')) {
+        mainNav.classList.remove('scrolled');
+      }
     }
-  });
+  }
+
+  setActiveNavLink();
+  revealCards();
 });
