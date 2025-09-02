@@ -429,12 +429,12 @@ footer {
 }
 
 .price-badge.you {
-  background-color: rgb(81, 165, 81);
+  background: linear-gradient(90deg, var(--dark-bg), var(--secondary));
   color: white;
-}
+} 
 
 .price-badge.market {
-  background-color: #7f8c8d;
+  background: linear-gradient(90deg, var(--footer-bg), var(--card-border));
   color: white;
 }
 
@@ -499,7 +499,7 @@ footer {
 
 /* --- NAVIGÁCIÓS MENÜ STÍLUSOK --- */
 .main-nav {
-  position: sticky;
+  position: normal;
   top: 0;
   left: 0;
   right: 0;
@@ -649,9 +649,11 @@ footer {
   }
   
   .comparison-table th, .comparison-table td {
-    padding: 12px 15px;
+    padding: 14px 25px;
     font-size: 14px;
+    white-space: wrap;
   }
+  
   
   .comparison-table {
     display: block;
@@ -660,6 +662,7 @@ footer {
   
   .price-badge {
     font-size: 12px;
-    padding: 4px 8px;
+    padding: 14px 24px;
+    white-space: nowrap;
   }
 }
