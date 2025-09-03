@@ -523,11 +523,12 @@ section[id],
 .main-nav {
   position: sticky;
   top: 15px;
-  left: 0;
-  right: 0;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
   background-color: rgba(38, 41, 43, 0.99);
   z-index: 1000;
-  padding: 0 20px;
+  padding: 0 75px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   border-radius: 15px;
   border: 3px solid var(--footer-bg);
@@ -552,7 +553,7 @@ section[id],
   text-decoration: none;
   padding: 15px 20px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.1s ease;
   position: relative;
 }
 
@@ -572,7 +573,7 @@ section[id],
   width: 0;
   height: 3px;
   background-color: var(--secondary);
-  transition: width 0.3s ease;
+  transition: width 0.1s ease;
   border-radius: 2px;
 }
 
@@ -600,7 +601,7 @@ section[id],
   height: 3px;
   background-color: var(--text-light);
   margin: 2px 0;
-  transition: all 0.3s ease;
+  transition: all 0.1s ease;
   border-radius: 2px;
 }
 
@@ -622,6 +623,9 @@ section[id],
   
   .main-nav.scrolled {
     background-color: var(--dark-bg);
+     left: 0;
+  width: 100%; /* A képernyő teljes szélességét kitölti */
+  
   }
 
   .nav-header {
@@ -631,7 +635,7 @@ section[id],
     padding: 15px 20px;
     background-color: transparent;
     border-bottom: none;
-    transition: all 0.5s ease-in-out;
+    transition: all 0.1s ease-in-out;
   }
   
   .main-nav.scrolled .nav-header {
@@ -642,7 +646,7 @@ section[id],
   .header-logo {
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.2s ease;
   }
 
   .header-content .page-main-title {
@@ -658,13 +662,13 @@ section[id],
     flex-direction: column;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-in-out, opacity 0.3s ease;
+    transition: opacity 0.3s ease;
   }
   
   .main-nav ul.open {
     max-height: 500px;
     opacity: 1;
-    transition: max-height 0.5s ease-in-out;
+    transition: max-height 0.1s ease-in-out;
     border: 3px solid var(--footer-bg);
     border-bottom-left-radius: 50px;
     border-bottom-right-radius: 50px;
@@ -673,6 +677,7 @@ section[id],
   .nav-toggle {
     display: flex;
     position: static;
+    
   }
   
   .nav-toggle.open span:nth-child(1) {

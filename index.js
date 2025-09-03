@@ -58,23 +58,32 @@ const mainNav = document.querySelector('.main-nav');
 const header = document.querySelector('header');
 const headerEnd = header.offsetHeight - 50;
 
-
 if (navToggle && navMenu) {
   navToggle.addEventListener('click', () => {
     navToggle.classList.toggle('open');
     navMenu.classList.toggle('open');
-    
-    // Új funkció: ha a menü nyitva van, hozzáadja a .scrolled osztályt a navigációs sávhoz
     if (navMenu.classList.contains('open')) {
       mainNav.classList.add('scrolled');
     } else {
-      // Ha a menü zárva van, és a felhasználó még nem görgetett le, eltávolítja a .scrolled osztályt
       if (window.scrollY < headerEnd) {
         mainNav.classList.remove('scrolled');
       }
     }
   });
 }
+
+// Új kód hozzáadása ide
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    if (navMenu.classList.contains('open')) {
+      navToggle.classList.remove('open');
+      navMenu.classList.remove('open');
+      if (window.scrollY < headerEnd) {
+        mainNav.classList.remove('scrolled');
+      }
+    }
+  });
+});
 
 const sections = document.querySelectorAll('section, .comparison-section, .faq-container');
 
@@ -103,13 +112,19 @@ window.addEventListener('scroll', () => {
     if (window.scrollY >= headerEnd) {
       mainNav.classList.add('scrolled');
     } else {
-      // Csak akkor távolítjuk el az osztályt, ha a menü zárva van
       if (!navMenu.classList.contains('open')) {
         mainNav.classList.remove('scrolled');
       }
     }
+  } else {
+    if (window.scrollY >= headerEnd) {
+      mainNav.classList.add('scrolled');
+    } else {
+      mainNav.classList.remove('scrolled');
+    }
   }
 
   setActiveNavLink();
-  revealCards();
 });
+
+setActiveNavLink();
