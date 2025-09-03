@@ -618,15 +618,17 @@ section[id],
     background-color: transparent;
     box-shadow: none;
     overflow: hidden;
-    
+    width: 100%;
   }
   
   .main-nav.scrolled {
     background-color: var(--dark-bg);
-     left: 0;
-  width: 100%; /* A képernyő teljes szélességét kitölti */
-  
+    left: 0;
+    width: 100%; /* A képernyő teljes szélességét kitölti */
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
   }
+   
 
   .nav-header {
     display: flex;
@@ -641,6 +643,7 @@ section[id],
   .main-nav.scrolled .nav-header {
     background-color: var(--card-bg);
     border-bottom: 3px solid var(--secondary);
+    
   }
 
   .header-logo {
@@ -670,8 +673,8 @@ section[id],
     opacity: 1;
     transition: max-height 0.1s ease-in-out;
     border: 3px solid var(--footer-bg);
-    border-bottom-left-radius: 50px;
-    border-bottom-right-radius: 50px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
   }
   
   .nav-toggle {
@@ -719,6 +722,7 @@ section[id],
     
     /* A halványodás előtti mozgás animáció a bezáráshoz */
     transition: transform 0.3s ease 0.3s, opacity 0.3s ease;
+    
   }
 
   .contact-methods {
