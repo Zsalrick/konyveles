@@ -562,7 +562,6 @@ section[id],
 .main-nav a:hover,
 .main-nav a.active {
   color: var(--secondary);
-  
   border-radius: 15px;
 }
 
