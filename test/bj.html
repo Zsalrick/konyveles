@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egyszerű Blackjack Játék</title>
+    
+    <style>
+        /*
+        A felhasználó kérése alapján:
+        A CSS-t itt helyezem el, hogy a fájl önálló legyen.
+        Ha a "../index.css" fájlt szeretnéd használni, töröld ezt a <style> blokkot
+        és illeszd be helyette:
+        <link rel="stylesheet" href="../index.css">
+        De a blackjack játék stílusát (kártyák, gombok) valószínűleg egyedi CSS-sel érdemesebb megírni.
+        */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #38761d; /* Kártyaasztal zöld */
+            color: #fff;
+        }
+
+        h1 {
+            color: #f1c232;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            border: 5px solid #a64d79;
+            border-radius: 15px;
+            background-color: #274e13;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .hand {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #4a86e8;
+            border-radius: 8px;
+            background-color: #434343;
+        }
+
+        .card-container {
+            display: flex;
+            gap: 10px;
+            min-height: 70px;
+        }
+
+        .card {
+            background-color: #fff;
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+            /* A kártya hátlapja a dealer számára */
+            transition: transform 0.5s;
+        }
+
+        .card.hidden {
+            background-color: #cc0000;
+            color: #cc0000;
+            cursor: pointer;
+            text-shadow: none;
+        }
+        
+        #message {
+            margin: 20px 0;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            color: #f1c232;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #deal-btn {
+            background-color: #3c78d8;
+            color: white;
+        }
+        #hit-btn {
+            background-color: #6aa84f;
+            color: white;
+        }
+        #stand-btn {
+            background-color: #a64d79;
+            color: white;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>♣️ Simple Blackjack ♠️</h1>
+
+    <div class="hand">
+        <h2>Osztó lapjai: <span id="dealer-score">0</span></h2>
+        <div id="dealer-cards" class="card-container">
+            </div>
+    </div>
+
+    <hr>
+
+    <div class="hand">
+        <h2>Játékos lapjai: <span id="player-score">0</span></h2>
+        <div id="player-cards" class="card-container">
+            </div>
+    </div>
+
+    <div id="message">Kattints az "Osztás" gombra a kezdéshez!</div>
+
+    <div class="controls">
+        <button id="deal-btn" onclick="deal()">Osztás</button>
+        <button id="hit-btn" onclick="hit()" disabled>Húz</button>
+        <button id="stand-btn" onclick="stand()" disabled>Megáll</button>
+    </div>
+</div>
+
+<script>
+    // Globális változók a játékállapothoz
+    let deck = [];
+    let playerHand = [];
+    let dealerHand = [];
+    let gameActive = false;
+
+    // Pontszámok megjelenítése
+    const dealerScoreDisplay = document.getElementById('dealer-score');
+    const playerScoreDisplay = document.getElementById('player-score');
+    const dealerCardsDisplay = document.getElementById('dealer-cards');
+    const playerCardsDisplay = document.getElementById('player-cards');
+    const messageDisplay = document.getElementById('message');
+    
+    // Gombok
+    const dealBtn = document.getElementById('deal-btn');
+    const hitBtn = document.getElementById('hit-btn');
+    const standBtn = document.getElementById('stand-btn');
+
+    /**
+     * Létrehoz egy új kártyapaklit (52 lap, 4 szín nélkül, csak értékekkel)
+     */
+    function createDeck() {
+        // 4 x (A, 2-10, J, Q, K)
+        const cards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        let newDeck = [];
+        for (let i = 0; i < 4; i++) {
+            newDeck = newDeck.concat(cards);
+        }
+        return newDeck;
+    }
+
+    /**
+     * Kártyaérték megállapítása. (Csak az alapérték, az Ász logikáját a pontszámítás kezeli)
+     */
+    function getCardValue(card) {
+        if (['J', 'Q', 'K'].includes(card)) {
+            return 10;
+        }
+        if (card === 'A') {
+            return 11; // Kezdőérték, szükség esetén 1-re csökken
+        }
+        return parseInt(card);
+    }
+
+    /**
+     * Kiszámolja a kéz pontszámát, figyelembe véve az Ász (A) értékét (1 vagy 11).
+     */
+    function calculateScore(hand) {
+        let score = 0;
+        let aceCount = 0;
+        
+        for (const card of hand) {
+            score += getCardValue(card);
+            if (card === 'A') {
+                aceCount++;
+            }
+        }
+        
+        // Ász kezelése: amíg a pontszám > 21 és van Ász, az Ász értéke 11-ről 1-re csökken.
+        while (score > 21 && aceCount > 0) {
+            score -= 10; // 11 -> 1
+            aceCount--;
+        }
+        return score;
+    }
+
+    /**
+     * Kártyapakli megkeverése (Fisher-Yates algoritmus)
+     */
+    function shuffleDeck(deck) {
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]]; // felcserélés
+        }
+    }
+
+    /**
+     * Kártya húzása a pakliból
+     */
+    function drawCard() {
+        if (deck.length === 0) {
+            // Ha a pakli kifogy, újra kell keverni, de ez egy egyszerű játékban ritka
+            deck = createDeck();
+            shuffleDeck(deck);
+        }
+        return deck.pop();
+    }
+
+    /**
+     * Egy kéz (hand) megjelenítése a képernyőn
+     */
+    function renderCards(hand, displayElement, isDealer = false, isGameOver = false) {
+        displayElement.innerHTML = '';
+        hand.forEach((card, index) => {
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('card');
+            
+            // Ha osztó, és nem ért véget a játék, és ez az első kártya (hátlappal lefelé)
+            if (isDealer && index === 0 && !isGameOver) {
+                cardDiv.classList.add('hidden');
+                cardDiv.textContent = '🃏'; // Kártya hátlapja
+            } else {
+                cardDiv.textContent = card;
+                // Piros szín a kártyákra, amik 10-es értékűek
+                if (['10', 'J', 'Q', 'K'].includes(card) || card === 'A') {
+                    cardDiv.style.color = '#cc0000';
+                }
+            }
+            displayElement.appendChild(cardDiv);
+        });
+    }
+
+    /**
+     * Pontszámok frissítése
+     */
+    function updateScores(isGameOver = false) {
+        const playerScore = calculateScore(playerHand);
+        playerScoreDisplay.textContent = playerScore;
+
+        // Csak a játék végén mutatjuk meg az osztó igazi pontszámát
+        if (isGameOver) {
+            dealerScoreDisplay.textContent = calculateScore(dealerHand);
+        } else {
+            // Az osztó első lapja rejtett, csak a második lap értékét mutatjuk
+            if (dealerHand.length > 1) {
+                // Csak a felfordított kártya pontszáma (a második kártya)
+                dealerScoreDisplay.textContent = getCardValue(dealerHand[1]);
+            } else {
+                dealerScoreDisplay.textContent = 0;
+            }
+        }
+        
+        renderCards(playerHand, playerCardsDisplay);
+        renderCards(dealerHand, dealerCardsDisplay, true, isGameOver);
+    }
+
+    /**
+     * Győztes ellenőrzése és játék befejezése
+     */
+    function checkWinner() {
+        const playerScore = calculateScore(playerHand);
+        const dealerScore = calculateScore(dealerHand);
+
+        gameActive = false;
+        hitBtn.disabled = true;
+        standBtn.disabled = true;
+        dealBtn.disabled = false;
+        dealBtn.textContent = 'Újra';
+
+        updateScores(true); // Felfedjük az osztó lapját
+
+        if (playerScore > 21) {
+            messageDisplay.textContent = `Veszítettél! Túllépted a 21-et (${playerScore}).`;
+        } else if (dealerScore > 21) {
+            messageDisplay.textContent = `Nyertél! Az Osztó túllépte a 21-et (${dealerScore})!`;
+        } else if (playerScore > dealerScore) {
+            messageDisplay.textContent = `Nyertél! (${playerScore} vs ${dealerScore})`;
+        } else if (dealerScore > playerScore) {
+            messageDisplay.textContent = `Veszítettél! (${playerScore} vs ${dealerScore})`;
+        } else {
+            messageDisplay.textContent = `Döntetlen! (${playerScore} vs ${dealerScore})`;
+        }
+    }
+
+    /*
+    * Játékos funkciók
+    */
+
+    /**
+     * Kártyaosztás és játék indítása
+     */
+    function deal() {
+        if (gameActive) return;
+
+        // Játék alaphelyzetbe állítása
+        deck = createDeck();
+        shuffleDeck(deck);
+        playerHand = [];
+        dealerHand = [];
+        gameActive = true;
+        
+        // Kezdőosztás: 2-2 lap
+        playerHand.push(drawCard(), drawCard());
+        dealerHand.push(drawCard(), drawCard());
+
+        messageDisplay.textContent = 'Játékban vagy. Húzol, vagy megállsz?';
+        dealBtn.disabled = true;
+        hitBtn.disabled = false;
+        standBtn.disabled = false;
+
+        updateScores();
+        
+        // Azonnali Blackjack ellenőrzés
+        if (calculateScore(playerHand) === 21) {
+            stand(); // Blackjack esetén az Osztó azonnal jön
+        }
+    }
+
+    /**
+     * Játékos húz egy lapot
+     */
+    function hit() {
+        if (!gameActive) return;
+
+        playerHand.push(drawCard());
+        updateScores();
+
+        if (calculateScore(playerHand) > 21) {
+            checkWinner(); // Játékos bukta
+        }
+    }
+
+    /**
+     * Játékos megáll (átadja a kört az osztónak)
+     */
+    function stand() {
+        if (!gameActive) return;
+        
+        // Osztó köre: húz, amíg el nem éri a 17-et
+        while (calculateScore(dealerHand) < 17) {
+            dealerHand.push(drawCard());
+        }
+
+        checkWinner(); // Győztes kihirdetése
+    }
+
+    // A játék indítása betöltéskor
+    updateScores(); 
+
+</script>
+
+</body>
+</html>
