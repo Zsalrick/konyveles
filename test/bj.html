@@ -8,80 +8,76 @@
     <link rel="stylesheet" href="../index.css">
     
     <style>
-        /*
-        EZ A STÍLUS BIZTOSÍTJA A JÁTÉK SPECIFIKUS MEGJELENÉSÉT.
-        A KÖVETKEZŐ SZÍNEKET HASZNÁLTAM (FELTÉTELEZETT PROFI TÉMA):
-        - Háttér/Asztal: #2c3e50 (Sötét Kék/Szürke)
-        - Ékezet/Cím: #f1c232 (Arany/Sárga)
-        - Elsődleges gomb (Osztás): #1c4587 (Mélykék - Brand szín)
-        - Kártyák hátlapja: #1c4587 (Mélykék)
-        */
+        /* A Blackjack játék specifikus stílusa, a weboldalad változóinak használatával */
 
         body {
-            /* Megtartja a külső weboldal hátterét, de flex elrendezés a játékhoz */
+            /* Biztosítja, hogy a játék a képernyő közepén jelenjen meg, a fő CSS változókat megtartva */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            min-height: 100vh; 
             margin: 0;
-            font-family: Arial, sans-serif;
-            color: #fff;
-            /* Ha az index.css nem ad meg semmit, ez a fallback */
-            background-color: #f0f0f0; 
+            background-color: var(--dark-bg); /* Sötét háttér a weboldaladról */
+            color: var(--text-light);
         }
 
         .game-container {
             width: 90%;
             max-width: 600px;
             padding: 20px;
-            border: 5px solid #f1c232; /* Arany keret */
-            border-radius: 15px;
-            background-color: #2c3e50; /* A játék "asztala" */
+            border: 5px solid var(--secondary); /* Másodlagos színű keret kiemelésként */
+            border-radius: 12px;
+            background-color: var(--card-bg); /* Sötétebb kártya háttér, mint az asztal */
             box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
         }
 
-        h1, #message {
-            color: #f1c232; /* Arany cím és üzenet */
+        h1, h2 {
+            color: var(--text-light); /* Fehér szöveg */
+            text-align: center;
         }
 
         .hand {
             margin-bottom: 20px;
             padding: 10px;
-            border: 1px solid #1c4587; 
+            border: 1px solid var(--card-border);
             border-radius: 8px;
-            background-color: #34495e;
+            background-color: var(--dark-bg); /* Még sötétebb, kontrasztos háttér a kártyáknak */
         }
 
         .card-container {
             display: flex;
             gap: 10px;
             min-height: 70px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .card {
-            background-color: #fff;
-            color: #000;
+            background-color: var(--text-light);
+            color: var(--dark-bg);
             padding: 10px 15px;
             border-radius: 5px;
             font-size: 1.5em;
             font-weight: bold;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
             transition: transform 0.5s;
         }
 
-        /* A rejtett kártya hátlapjának színe, a brandhez igazítva */
+        /* A rejtett kártya (dealer első lapja) a primary-light színnel */
         .card.hidden {
-            background-color: #1c4587;
-            color: #1c4587;
+            background-color: var(--primary-light); 
+            color: var(--primary-light);
             cursor: default;
             text-shadow: none;
         }
         
         #message {
+            margin: 20px 0;
             font-size: 1.5em;
             font-weight: bold;
             text-align: center;
+            color: var(--secondary); /* Kiemelés a fő üzeneteknek */
         }
 
         .controls {
@@ -91,35 +87,38 @@
             margin-top: 20px;
         }
 
-        /* Gombok stílusa */
+        /* Gombok a weboldal stílusához igazítva */
         button {
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 1em;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
         }
 
         #deal-btn {
-            background-color: #1c4587; /* Márka kék */
+            background-color: var(--primary-light); /* Primary szín az indításhoz */
         }
         #hit-btn {
-            background-color: #27ae60; /* Zöld (Húz/Tovább) */
+            background-color: var(--secondary); /* Secondary szín a folytatáshoz/húzáshoz */
         }
         #stand-btn {
-            background-color: #c0392b; /* Piros (Megáll) */
+            background-color: var(--accent); /* Accent szín a megálláshoz/befejezéshez */
         }
 
         button:hover:not(:disabled) {
-            opacity: 0.8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         button:disabled {
-            background-color: #95a5a6;
+            background-color: var(--card-border);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
     </style>
@@ -129,14 +128,16 @@
 <div class="game-container">
     <h1>♣️ Egyszerű Blackjack ♠️</h1>
 
+    ---
+    
     <div class="hand">
         <h2>Osztó lapjai: <span id="dealer-score">0</span></h2>
         <div id="dealer-cards" class="card-container">
             </div>
     </div>
 
-    <hr>
-
+    ---
+    
     <div class="hand">
         <h2>Játékos lapjai: <span id="player-score">0</span></h2>
         <div id="player-cards" class="card-container">
@@ -232,9 +233,10 @@
                 cardDiv.textContent = '🃏';
             } else {
                 cardDiv.textContent = card;
-                // Piros szín a tizes értékű lapokra
+                // A lapok színeit pirosra állítjuk (fekete helyett) a jobb kontraszt érdekében a fehér kártyán
                 if (['10', 'J', 'Q', 'K'].includes(card) || card === 'A') {
-                    cardDiv.style.color = '#cc0000'; 
+                    // Ha a kártya 10-es értékű, piros színnel
+                    cardDiv.style.color = 'var(--accent)'; 
                 }
             }
             displayElement.appendChild(cardDiv);
@@ -249,6 +251,7 @@
             dealerScoreDisplay.textContent = calculateScore(dealerHand);
         } else {
             if (dealerHand.length > 1) {
+                // Csak a felfordított kártya értékét mutatjuk a játék elején
                 dealerScoreDisplay.textContent = getCardValue(dealerHand[1]);
             } else {
                 dealerScoreDisplay.textContent = 0;
@@ -324,6 +327,7 @@
     function stand() {
         if (!gameActive) return;
         
+        // Osztó köre: húz, amíg el nem éri a 17-et
         while (calculateScore(dealerHand) < 17) {
             dealerHand.push(drawCard());
         }
@@ -336,3 +340,4 @@
 
 </body>
 </html>
+
