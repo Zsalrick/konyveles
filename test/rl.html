@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magyar Rulett Játék (6 Kamrás)</title>
+    <title>Magyar Rulett Játék (6 Kamrás, Korrigált)</title>
     
     <link rel="stylesheet" href="../index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* [Ugyanaz a CSS stílus, mint korábban, a webhely dizájnjához igazítva] */
+        /* [CSS stílusok, változatlanul] */
         body {
             display: flex;
             flex-direction: column;
@@ -170,8 +170,8 @@
 
         <div class="action-buttons">
             <button id="respin-btn" onclick="respin()" disabled>Újrapörgetés (-0.1 HP)</button>
-            <button id="shoot-self-btn" onclick="shoot('player')" disabled>Magamra lövök</button>
-            <button id="shoot-opponent-btn" onclick="shoot('ai')" disabled>Ellenfélre lövök</button>
+            <button id="shoot-self-btn" onclick="shoot('player')" disabled>Magamra lövök (1/kör)</button>
+            <button id="shoot-opponent-btn" onclick="shoot('ai')" disabled>Ellenfélre lövök (Kör vége)</button>
         </div>
     </section>
 </main>
@@ -180,8 +180,11 @@
     // --- JÁTÉK ÁLLAPOT VÁLTOZÓK ---
     let playerHP = 3.0;
     let aiHP = 3.0;
-    let turn = ''; // 'player' or 'ai'
+    let turn = ''; 
     let isGameOver = false;
+    
+    // ÚJ VÁLTOZÓ A KORLÁTOZÁSHOZ
+    let selfShotUsedThisTurn = false; 
 
     // A TÁR ÁLLAPOTA (0=Üres, 1=Éles)
     let chambers = []; 
@@ -199,9 +202,6 @@
 
     // --- SEGÉD FUNKCIÓK ---
 
-    /**
-     * Frissíti a HP kijelzőket
-     */
     function updateHPDisplay() {
         playerHpDisplay.textContent = playerHP.toFixed(1);
         aiHpDisplay.textContent = aiHP.toFixed(1);
@@ -210,40 +210,26 @@
         aiHpLevel.style.width = Math.max(0, (aiHP / 3) * 100) + '%';
     }
     
-    /**
-     * Töltés és pörgetés (új golyó a 6 kamrában, randomizálva)
-     */
     function initialLoadAndSpin() {
-        // 5 üres (0) és 1 éles (1)
         chambers = [0, 0, 0, 0, 0, 1]; 
-        // Array megkeverése (pörgetés szimulálása)
         chambers.sort(() => Math.random() - 0.5); 
     }
 
-    /**
-     * Lövés (tár elől haladása, találat ellenőrzése)
-     * @returns {boolean} Igaz, ha eltalálta a golyó
-     */
     function fireGun() {
         if (chambers.length === 0) {
-            // Ez elvileg nem fordulhat elő, mert találat után rögtön újratölt.
             initialLoadAndSpin(); 
         }
 
         const hit = (chambers[0] === 1);
-        chambers.shift(); // A kamra előre ugrik (első elem eltűnik)
+        chambers.shift(); 
 
         if (hit) {
-            // Ha találat volt, azonnal újratölt és pörög (külön HP költség nélkül)
             initialLoadAndSpin(); 
         }
         
         return hit;
     }
 
-    /**
-     * Végjáték ellenőrzése
-     */
     function checkGameOver() {
         if (playerHP <= 0) {
             playerHP = 0;
@@ -264,18 +250,12 @@
         return false;
     }
 
-    /**
-     * Gombok letiltása
-     */
     function disableButtons() {
         respinBtn.disabled = true;
         shootSelfBtn.disabled = true;
         shootOpponentBtn.disabled = true;
     }
 
-    /**
-     * Gombok beállítása az aktuális játékos számára
-     */
     function setPlayerTurnControls() {
         if (isGameOver) {
             disableButtons();
@@ -283,27 +263,36 @@
         }
         
         const remainingChambers = chambers.length;
-        const P_live = 1 / remainingChambers;
-
+        
         turn = 'player';
         respinBtn.disabled = false;
-        shootSelfBtn.disabled = false;
         shootOpponentBtn.disabled = false;
         
-        // Üzenet a valós valószínűséggel
+        // Önlövés korlátozása
+        shootSelfBtn.disabled = selfShotUsedThisTurn; 
+
         messageDisplay.innerHTML = `Te vagy soron! ${remainingChambers} kamra maradt. (Golyó esélye: 1/${remainingChambers})`;
+        
+        if (selfShotUsedThisTurn) {
+            shootSelfBtn.textContent = 'Magadra lövök (Felhasznált)';
+        } else {
+            shootSelfBtn.textContent = 'Magamra lövök (1/kör)';
+        }
     }
 
     /**
-     * Fordulat átadása
+     * Fordulat átadása és állapot resetelése
      */
     function passTurn() {
         if (checkGameOver()) return;
+        
+        // Kör vége, reseteljük az önlövés limitet
+        selfShotUsedThisTurn = false; 
 
         if (turn === 'player') {
             turn = 'ai';
             messageDisplay.textContent = 'Ellenfél következik...';
-            setTimeout(aiTurn, 1500); // Késleltetés a szimulációhoz
+            setTimeout(aiTurn, 1500); 
         } else {
             setPlayerTurnControls();
         }
@@ -312,7 +301,7 @@
     // --- JÁTÉKOS AKCIÓK ---
 
     /**
-     * Újrapörgetés (-0.1 HP)
+     * Újrapörgetés (-0.1 HP), turn continues.
      */
     window.respin = function() {
         if (turn !== 'player' || isGameOver) return;
@@ -321,12 +310,12 @@
         
         if (checkGameOver()) return;
 
-        initialLoadAndSpin(); // Pörgetés reseteli a kamrát
+        initialLoadAndSpin(); 
         updateHPDisplay();
         
-        messageDisplay.innerHTML = 'Újrapörgetted a tárat! (-0.1 HP). Lőnöd kell!';
+        messageDisplay.innerHTML = 'Újrapörgetted a tárat! (-0.1 HP). A kör nálad marad!';
         
-        setPlayerTurnControls(); // A kör marad
+        setPlayerTurnControls(); 
     }
 
     /**
@@ -335,13 +324,23 @@
     window.shoot = function(target) {
         if (turn !== 'player' || isGameOver) return;
         
+        if (target === 'player' && selfShotUsedThisTurn) {
+            messageDisplay.innerHTML = 'HIBA: Már használtad az önlövés jogát ebben a körben!';
+            return;
+        }
+
         disableButtons();
         
         const hit = fireGun();
         const chamberStatus = hit ? 'ÉLES GOLYÓ' : 'ÜRES TÁR';
+        let turnPasses = (target === 'ai' || hit); 
         
         let targetName = (target === 'player') ? 'magadra' : 'az Ellenfélre';
         messageDisplay.innerHTML = `A Játékos lő ${targetName}... [Kamra: ${chamberStatus}]`;
+        
+        if (target === 'player') {
+             selfShotUsedThisTurn = true; // Elhasználta a jogot
+        }
 
         setTimeout(() => {
             if (hit) {
@@ -352,12 +351,20 @@
                     aiHP -= 1;
                     messageDisplay.innerHTML = `Sikeres lövés! Az Ellenfél elveszített -1 HP-t. A tár újra pörög!`;
                 }
+                turnPasses = true; // Találat esetén a kör mindig átmegy a lőszer elhasználása miatt.
             } else {
-                messageDisplay.innerHTML = `KATT! Üres volt. Szerencséd van.`;
+                messageDisplay.innerHTML = `KATT! Üres volt. `;
             }
-
+            
             updateHPDisplay();
-            passTurn();
+
+            if (turnPasses) {
+                passTurn();
+            } else {
+                // Magára lőtt, és mellé ment. Kör folytatódik.
+                messageDisplay.innerHTML += ` A kör nálad marad!`;
+                setPlayerTurnControls(); 
+            }
         }, 1000);
     }
 
@@ -369,26 +376,21 @@
         const remainingChambers = chambers.length;
         const P_live = 1 / remainingChambers;
         
-        let aiAction = '';
+        let aiAction = ''; // 'respin', 'shoot-self', 'shoot-player'
 
-        // 1. AI DÖNTÉS: ÚJRAPÖRGETÉS VAGY LÖVÉS?
-        // Ha a golyó esélye 1/3 (3 kamra maradt) vagy nagyobb, az AI veszélyben van.
+        // AI DÖNTÉS: 
         if (P_live >= 1/3) { 
-            // Ha a játékos HP-ja nagyon alacsony, megéri a kockázatot.
             if (playerHP <= 1) {
                 aiAction = 'shoot-player';
             } else {
-                // Túl nagy a kockázat (1/3, 1/2 vagy 1/1), pörgetni kell, hogy elkerülje a találatot.
                 aiAction = 'respin';
             }
         } else {
-            // 2. AI DÖNTÉS: ÖNMAGÁRA VAGY JÁTÉKOSRA?
-            // Kicsi a valószínűség (1/6, 1/5, 1/4).
-            // Magára lő, hogy a magasabb kockázatú tárat a játékosra hagyja.
+            // AI okos lépése: alacsony valószínűség -> magára lő, hogy a veszélyt a játékosra hagyja.
             aiAction = 'shoot-self';
         }
 
-        // --- AKCIÓ VÉGREHAJTÁSA ---
+        // AKCIÓ VÉGREHAJTÁSA (Az AI köre mindig véget ér a lövéssel, mivel a szabály csak a játékosra vonatkozik)
         
         if (aiAction === 'respin') {
             aiHP -= 0.1;
@@ -434,6 +436,7 @@
         playerHP = 3.0;
         aiHP = 3.0;
         isGameOver = false;
+        selfShotUsedThisTurn = false; 
         initialLoadAndSpin();
         updateHPDisplay();
         
