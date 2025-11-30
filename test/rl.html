@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magyar Rulett Játék</title>
+    <title>Magyar Rulett Játék (6 Kamrás)</title>
     
     <link rel="stylesheet" href="../index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* A JÁTÉK SPECIFIKUS STÍLUSA, A WEBHELY SZÍNEIT HASZNÁLVA */
-
+        /* [Ugyanaz a CSS stílus, mint korábban, a webhely dizájnjához igazítva] */
         body {
             display: flex;
             flex-direction: column;
@@ -33,7 +32,6 @@
             border: 1px solid var(--card-border);
         }
 
-        /* --- HP KIJELZŐK --- */
         .status-container {
             display: flex;
             justify-content: space-between;
@@ -56,7 +54,7 @@
         .hp-bar {
             width: 100%;
             height: 10px;
-            background-color: var(--accent); /* Piros a veszély jelzésére */
+            background-color: var(--accent);
             border-radius: 5px;
             margin-top: 5px;
             overflow: hidden;
@@ -64,9 +62,9 @@
 
         .hp-level {
             height: 100%;
-            background-color: var(--secondary); /* Zöld a HP szint jelzésére */
+            background-color: var(--secondary);
             transition: width 0.3s ease-out;
-            width: 100%; /* Kezdeti érték */
+            width: 100%;
         }
 
         .ai-status {
@@ -76,7 +74,6 @@
             border-right: 2px solid var(--card-border);
         }
 
-        /* --- JÁTÉK ÜZENETEK ÉS KONTROLLOK --- */
         #message {
             text-align: center;
             margin: 20px 0;
@@ -92,7 +89,6 @@
             margin-top: 30px;
         }
         
-        /* Gombok a webhely stílusához igazítva */
         button {
             padding: 14px 25px;
             border-radius: 8px;
@@ -106,11 +102,11 @@
         }
 
         #shoot-self-btn, #shoot-opponent-btn {
-            background-color: var(--primary-light); /* Kék - Akció */
+            background-color: var(--primary-light);
         }
 
         #respin-btn {
-            background-color: var(--accent); /* Piros - Kockázat */
+            background-color: var(--accent);
         }
         
         button:hover:not(:disabled) {
@@ -126,12 +122,10 @@
             box-shadow: none;
         }
         
-        /* Külön a Re-spin gomb színezése a HP költség miatt */
         #respin-btn:hover:not(:disabled) {
-             background-color: #f39c12; /* Narancssárga árnyalat */
+             background-color: #f39c12;
         }
         
-        /* Mobil optimalizáció */
         @media (max-width: 600px) {
             .status-container {
                 flex-direction: column;
@@ -159,7 +153,7 @@
 
 <main>
     <section class="game-section">
-        <h2 style="margin-top: 0; padding-bottom: 10px;">Magyar Rulett: Golyó a Tárban</h2>
+        <h2 style="margin-top: 0; padding-bottom: 10px;">Magyar Rulett: Golyó a Tárban (6 Kamra)</h2>
 
         <div class="status-container">
             <div class="player-status">
@@ -187,8 +181,11 @@
     let playerHP = 3.0;
     let aiHP = 3.0;
     let turn = ''; // 'player' or 'ai'
-    let emptyCount = 0; // Hányszor volt mellé a legutolsó pörgetés óta (0-5)
     let isGameOver = false;
+
+    // A TÁR ÁLLAPOTA (0=Üres, 1=Éles)
+    let chambers = []; 
+    const MAX_CHAMBERS = 6;
 
     // --- DOM ELEMEK ---
     const playerHpDisplay = document.getElementById('player-hp');
@@ -214,29 +211,34 @@
     }
     
     /**
-     * Eldönti, hogy a lőtt kamrában volt-e a golyó
-     * @returns {boolean} Igaz, ha eltalálta a golyó
+     * Töltés és pörgetés (új golyó a 6 kamrában, randomizálva)
      */
-    function fireGun() {
-        emptyCount++; // A kamra előre ugrik
-        
-        // Ha emptyCount = 6, akkor tuti a golyó. 
-        // Valójában a golyó valahol az 1. és 6. kamra között van, a valószínűség 1/maradek.
-        // A mi egyszerűsített modellünkben: a 6. kamra a golyó.
-        const hit = (emptyCount === 6);
-        
-        if (hit) {
-            emptyCount = 0; // Újratöltés a találat után
-        }
-        
-        return hit;
+    function initialLoadAndSpin() {
+        // 5 üres (0) és 1 éles (1)
+        chambers = [0, 0, 0, 0, 0, 1]; 
+        // Array megkeverése (pörgetés szimulálása)
+        chambers.sort(() => Math.random() - 0.5); 
     }
 
     /**
-     * Töltés és pörgetés (csak a játék kezdetén és újratöltéskor)
+     * Lövés (tár elől haladása, találat ellenőrzése)
+     * @returns {boolean} Igaz, ha eltalálta a golyó
      */
-    function initialLoadAndSpin() {
-        emptyCount = 0; // A 6. kamra a golyó (1/6 esély az elsőre)
+    function fireGun() {
+        if (chambers.length === 0) {
+            // Ez elvileg nem fordulhat elő, mert találat után rögtön újratölt.
+            initialLoadAndSpin(); 
+        }
+
+        const hit = (chambers[0] === 1);
+        chambers.shift(); // A kamra előre ugrik (első elem eltűnik)
+
+        if (hit) {
+            // Ha találat volt, azonnal újratölt és pörög (külön HP költség nélkül)
+            initialLoadAndSpin(); 
+        }
+        
+        return hit;
     }
 
     /**
@@ -279,11 +281,17 @@
             disableButtons();
             return;
         }
+        
+        const remainingChambers = chambers.length;
+        const P_live = 1 / remainingChambers;
+
         turn = 'player';
         respinBtn.disabled = false;
         shootSelfBtn.disabled = false;
         shootOpponentBtn.disabled = false;
-        messageDisplay.innerHTML = `Te vagy soron! ${6 - emptyCount} kamra maradt. (Golyó esélye: 1/${6 - emptyCount})`;
+        
+        // Üzenet a valós valószínűséggel
+        messageDisplay.innerHTML = `Te vagy soron! ${remainingChambers} kamra maradt. (Golyó esélye: 1/${remainingChambers})`;
     }
 
     /**
@@ -311,17 +319,14 @@
         
         playerHP -= 0.1;
         
-        // HP ellenőrzése (ha re-spinbe halt bele)
         if (checkGameOver()) return;
 
-        initialLoadAndSpin(); // Pörgetés reseteli a kamra számlálót
+        initialLoadAndSpin(); // Pörgetés reseteli a kamrát
         updateHPDisplay();
         
-        messageDisplay.innerHTML = 'Újrapörgetted a tárat. A következő lépés lövés kell legyen!';
+        messageDisplay.innerHTML = 'Újrapörgetted a tárat! (-0.1 HP). Lőnöd kell!';
         
-        // A szabály szerint lőnie kell magára, de itt a kód kényelme miatt engedjük az ellenfélre lövést is.
-        // A lényeg, hogy a kör nem ér véget.
-        setPlayerTurnControls();
+        setPlayerTurnControls(); // A kör marad
     }
 
     /**
@@ -342,19 +347,13 @@
             if (hit) {
                 if (target === 'player') {
                     playerHP -= 1;
-                    messageDisplay.innerHTML = `BUMM! Elvetted magadtól -1 HP-t.`;
+                    messageDisplay.innerHTML = `BUMM! Elvetted magadtól -1 HP-t. A tár újra pörög!`;
                 } else {
                     aiHP -= 1;
-                    messageDisplay.innerHTML = `Sikeres lövés! Az Ellenfél elveszített -1 HP-t.`;
+                    messageDisplay.innerHTML = `Sikeres lövés! Az Ellenfél elveszített -1 HP-t. A tár újra pörög!`;
                 }
             } else {
                 messageDisplay.innerHTML = `KATT! Üres volt. Szerencséd van.`;
-            }
-
-            if (hit) {
-                // A golyó kilövése után a golyó újratöltődik és pörög (mínusz HP nélkül).
-                initialLoadAndSpin(); 
-                messageDisplay.innerHTML += ` A tár újratöltve és pörög!`;
             }
 
             updateHPDisplay();
@@ -367,26 +366,25 @@
     function aiTurn() {
         if (isGameOver) return;
         
-        // Valószínűség (P_live) kiszámítása (1/maradék kamra)
-        const remainingChambers = 6 - emptyCount;
+        const remainingChambers = chambers.length;
         const P_live = 1 / remainingChambers;
         
         let aiAction = '';
 
         // 1. AI DÖNTÉS: ÚJRAPÖRGETÉS VAGY LÖVÉS?
-        // Ha a golyó esélye 1/3 (remainingChambers = 3, emptyCount = 3) vagy több, az AI veszélyben van.
-        if (P_live >= 1/3) {
+        // Ha a golyó esélye 1/3 (3 kamra maradt) vagy nagyobb, az AI veszélyben van.
+        if (P_live >= 1/3) { 
             // Ha a játékos HP-ja nagyon alacsony, megéri a kockázatot.
             if (playerHP <= 1) {
-                aiAction = 'shoot-opponent';
+                aiAction = 'shoot-player';
             } else {
-                // Ha túl nagy a kockázat, érdemes pörgetni (bár kerül 0.1 HP-t).
+                // Túl nagy a kockázat (1/3, 1/2 vagy 1/1), pörgetni kell, hogy elkerülje a találatot.
                 aiAction = 'respin';
             }
         } else {
-            // 2. AI DÖNTÉS: ÖNMAGÁRA VAGY ELLENFÉLRE?
-            // Ha kicsi a valószínűség (P_live < 1/3), az AI megpróbálja magára lőni, 
-            // hogy a magasabb kockázatú tárat a játékosra hagyja.
+            // 2. AI DÖNTÉS: ÖNMAGÁRA VAGY JÁTÉKOSRA?
+            // Kicsi a valószínűség (1/6, 1/5, 1/4).
+            // Magára lő, hogy a magasabb kockázatú tárat a játékosra hagyja.
             aiAction = 'shoot-self';
         }
 
@@ -415,18 +413,13 @@
                 if (hit) {
                     if (target === 'ai') {
                         aiHP -= 1;
-                        messageDisplay.innerHTML = `BUMM! Az Ellenfél eltalálta magát (-1 HP).`;
+                        messageDisplay.innerHTML = `BUMM! Az Ellenfél eltalálta magát (-1 HP). A tár újra pörög!`;
                     } else {
                         playerHP -= 1;
-                        messageDisplay.innerHTML = `Sikeres lövés! A Játékos elveszített -1 HP-t.`;
+                        messageDisplay.innerHTML = `Sikeres lövés! A Játékos elveszített -1 HP-t. A tár újra pörög!`;
                     }
                 } else {
                     messageDisplay.innerHTML = `KATT! Üres volt. `;
-                }
-
-                if (hit) {
-                    initialLoadAndSpin(); 
-                    messageDisplay.innerHTML += ` A tár újratöltve és pörög!`;
                 }
 
                 updateHPDisplay();
@@ -444,10 +437,9 @@
         initialLoadAndSpin();
         updateHPDisplay();
         
-        // Randomizált kezdő
         turn = (Math.random() < 0.5) ? 'player' : 'ai';
         
-        messageDisplay.innerHTML = `A tár pörög. Kezdő: **${(turn === 'player' ? 'Játékos' : 'Ellenfél')}**`;
+        messageDisplay.innerHTML = `A tár pörög. Kezdő: ${turn === 'player' ? 'Játékos' : 'Ellenfél'}`;
 
         if (turn === 'player') {
             setPlayerTurnControls();
@@ -457,7 +449,6 @@
         }
     }
 
-    // Játék indítása
     initGame();
 </script>
 
