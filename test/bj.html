@@ -3,122 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Egyszerű Blackjack Játék</title>
+    <title>Rulett Minijáték</title>
     
     <link rel="stylesheet" href="../index.css">
     
     <style>
-        /* A Blackjack játék specifikus stílusa, a weboldalad változóinak használatával */
+        /* CSS VÁLTOZÓK REPLIKÁLÁSA A KÖNNYEBB STÍLUSHOZ */
+        :root {
+            --primary-dark: #1a5276;
+            --primary: #2c7cba;
+            --primary-light: #3498db;
+            --secondary: #1abc9c;
+            --accent: #e74c3c;
+            --dark-bg: #2c3e50;
+            --card-bg: #34495e;
+            --card-border: #4a6278;
+            --text-light: #ffffff;
+            --text-muted: #ecf0f1;
+            --footer-bg: #1a252f;
+            --highlight: #a3e4d7;
+            --price-green: #5ef19b;
+            --red-roulette: #cc0000;
+            --black-roulette: #111111;
+            --green-roulette: #008000;
+        }
 
         body {
-            /* Biztosítja, hogy a játék a képernyő közepén jelenjen meg, a fő CSS változókat megtartva */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh; 
+            min-height: 100vh;
             margin: 0;
-            background-color: var(--dark-bg); /* Sötét háttér a weboldaladról */
+            background-color: var(--dark-bg);
             color: var(--text-light);
+            font-family: 'Montserrat', Arial, sans-serif;
+            padding: 20px;
         }
 
         .game-container {
-            width: 90%;
-            max-width: 600px;
-            padding: 20px;
-            border: 5px solid var(--secondary); /* Másodlagos színű keret kiemelésként */
+            width: 95%;
+            max-width: 900px;
+            padding: 30px;
+            border: 5px solid var(--secondary);
             border-radius: 12px;
-            background-color: var(--card-bg); /* Sötétebb kártya háttér, mint az asztal */
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
+            background-color: var(--card-bg); /* Sötét asztal háttér */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
         }
 
-        h1, h2 {
-            color: var(--text-light); /* Fehér szöveg */
-            text-align: center;
-        }
-
-        .hand {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            background-color: var(--dark-bg); /* Még sötétebb, kontrasztos háttér a kártyáknak */
-        }
-
-        .card-container {
+        /* --- FELSŐ INFORMÁCIÓK ÉS VEZÉRLÉS --- */
+        .header-controls {
             display: flex;
-            gap: 10px;
-            min-height: 70px;
-            justify-content: center;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .card {
-            background-color: var(--text-light);
-            color: var(--dark-bg);
-            padding: 10px 15px;
-            border-radius: 5px;
+        #balance, #result {
             font-size: 1.5em;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            transition: transform 0.5s;
+            font-weight: 700;
+            color: var(--highlight);
         }
 
-        /* A rejtett kártya (dealer első lapja) a primary-light színnel */
-        .card.hidden {
-            background-color: var(--primary-light); 
-            color: var(--primary-light);
-            cursor: default;
-            text-shadow: none;
+        #result {
+            color: var(--secondary);
+        }
+
+        /* --- ZSETON VÁLASZTÁS --- */
+        .chip-selection {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .chip {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            border: 3px solid transparent;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s;
         }
         
-        #message {
-            margin: 20px 0;
-            font-size: 1.5em;
-            font-weight: bold;
-            text-align: center;
-            color: var(--secondary); /* Kiemelés a fő üzeneteknek */
+        /* Zseton színek a weboldal stílusához igazítva */
+        .chip[data-value="1"] { background-color: var(--primary-light); }
+        .chip[data-value="5"] { background-color: var(--secondary); }
+        .chip[data-value="25"] { background-color: var(--accent); }
+        .chip[data-value="100"] { background-color: var(--price-green); }
+
+        .chip.active {
+            border-color: var(--text-light);
+            transform: scale(1.1);
         }
 
-        .controls {
+        /* --- RUETT ASZTAL (GRiD) --- */
+        .roulette-table {
+            display: grid;
+            grid-template-columns: 1fr repeat(3, 1fr); /* 0 + 3 oszlop */
+            gap: 5px;
+            margin: 0 auto 30px;
+            border: 2px solid var(--secondary);
+            border-radius: 5px;
+            background-color: var(--primary-dark);
+        }
+
+        .cell {
+            padding: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            position: relative;
+            border: 1px solid var(--card-border);
+        }
+        
+        .cell:hover {
+            opacity: 0.8;
+        }
+
+        /* 0 Cella */
+        .zero-cell {
+            grid-row: 1 / span 12;
+            background-color: var(--green-roulette);
+        }
+
+        /* 1-36 Számok */
+        .number-cell {
+            color: var(--text-light);
+        }
+        .red { background-color: var(--red-roulette); }
+        .black { background-color: var(--black-roulette); }
+
+        /* Különleges mezők (Red/Black, Even/Odd) */
+        .outside-cell {
+            grid-column: 2 / span 3;
+        }
+        .outside-cell.red { background-color: var(--red-roulette); }
+        .outside-cell.black { background-color: var(--black-roulette); }
+        .outside-cell.even { background-color: var(--black-roulette); }
+        .outside-cell.odd { background-color: var(--black-roulette); }
+        
+        /* Tét jelzése a cellán */
+        .bet-amount {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--secondary);
+            color: var(--dark-bg);
+            padding: 2px 5px;
+            border-bottom-left-radius: 5px;
+            font-size: 0.7em;
+        }
+
+        /* --- MŰVELETI GOMBOK --- */
+        .action-buttons {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 20px;
         }
 
-        /* Gombok a weboldal stílusához igazítva */
-        button {
-            padding: 12px 25px;
-            font-size: 1em;
-            cursor: pointer;
+        .action-buttons button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 700;
             border: none;
             border-radius: 8px;
+            cursor: pointer;
             color: var(--text-light);
-            font-weight: 600;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: all 0.3s;
         }
 
-        #deal-btn {
-            background-color: var(--primary-light); /* Primary szín az indításhoz */
+        #spin-btn {
+            background-color: var(--secondary); /* Spin (Pörgetés) - Fő akció */
         }
-        #hit-btn {
-            background-color: var(--secondary); /* Secondary szín a folytatáshoz/húzáshoz */
-        }
-        #stand-btn {
-            background-color: var(--accent); /* Accent szín a megálláshoz/befejezéshez */
-        }
-
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        button:disabled {
+        #spin-btn:disabled {
             background-color: var(--card-border);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        }
+        
+        #clear-btn {
+            background-color: var(--accent); /* Clear (Törlés) - Veszély */
+        }
+        #clear-btn:disabled {
+            background-color: var(--card-border);
+        }
+
+        .action-buttons button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Animáció a nyertes cellán */
+        .winner {
+            animation: pulse-win 1s 5;
+        }
+
+        @keyframes pulse-win {
+            0% { box-shadow: 0 0 10px 5px var(--secondary); }
+            50% { box-shadow: 0 0 20px 10px var(--highlight); }
+            100% { box-shadow: 0 0 10px 5px var(--secondary); }
         }
 
     </style>
@@ -126,218 +216,294 @@
 <body>
 
 <div class="game-container">
-    <h1>♣️ Egyszerű Blackjack ♠️</h1>
+    <h1>🔴⚫️ Rulett Asztal 🟢</h1>
 
-    ---
+    <div class="header-controls">
+        <div>
+            Egyenleg: <span id="balance">$5000</span>
+        </div>
+        <div id="result">
+            Kész! Tegyél tétet!
+        </div>
+    </div>
     
-    <div class="hand">
-        <h2>Osztó lapjai: <span id="dealer-score">0</span></h2>
-        <div id="dealer-cards" class="card-container">
-            </div>
+    <div class="chip-selection">
+        <div class="chip active" data-value="1" onclick="selectChip(1)">$1</div>
+        <div class="chip" data-value="5" onclick="selectChip(5)">$5</div>
+        <div class="chip" data-value="25" onclick="selectChip(25)">$25</div>
+        <div class="chip" data-value="100" onclick="selectChip(100)">$100</div>
     </div>
 
-    ---
-    
-    <div class="hand">
-        <h2>Játékos lapjai: <span id="player-score">0</span></h2>
-        <div id="player-cards" class="card-container">
-            </div>
+    <div class="roulette-table">
+        <div id="cell-0" class="cell zero-cell" onclick="placeBet('0')">
+            0
+            <span class="bet-amount" data-bet-id="0"></span>
+        </div>
+
+        <script>
+            // Segédfüggvény a rulett színekhez
+            const colors = {
+                1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black',
+                7: 'red', 8: 'black', 9: 'red', 10: 'black', 11: 'black', 12: 'red',
+                13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red',
+                19: 'red', 20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black',
+                25: 'red', 26: 'black', 27: 'red', 28: 'black', 29: 'black', 30: 'red',
+                31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red'
+            };
+            
+            // Tábla generálása
+            for (let i = 1; i <= 36; i++) {
+                const colorClass = colors[i];
+                const row = (i - 1) % 3; // 0, 1, 2
+                const gridRow = 12 - Math.floor((i - 1) / 3); // Kezdő sor, alulról felfelé
+                const gridColumn = 4 - row; // Oszlop (2, 3, 4)
+                
+                document.write(`
+                    <div id="cell-${i}" class="cell number-cell ${colorClass}" 
+                         style="grid-row: ${gridRow}; grid-column: ${gridColumn};" 
+                         onclick="placeBet('${i}')">
+                        ${i}
+                        <span class="bet-amount" data-bet-id="${i}"></span>
+                    </div>
+                `);
+            }
+        </script>
+
+        <div id="cell-red" class="cell outside-cell red" style="grid-row: 13; grid-column: 2;" onclick="placeBet('red')">
+            RED
+            <span class="bet-amount" data-bet-id="red"></span>
+        </div>
+        <div id="cell-black" class="cell outside-cell black" style="grid-row: 13; grid-column: 3;" onclick="placeBet('black')">
+            BLACK
+            <span class="bet-amount" data-bet-id="black"></span>
+        </div>
+        <div id="cell-even" class="cell outside-cell even" style="grid-row: 14; grid-column: 2;" onclick="placeBet('even')">
+            EVEN
+            <span class="bet-amount" data-bet-id="even"></span>
+        </div>
+        <div id="cell-odd" class="cell outside-cell odd" style="grid-row: 14; grid-column: 3;" onclick="placeBet('odd')">
+            ODD
+            <span class="bet-amount" data-bet-id="odd"></span>
+        </div>
+        
     </div>
 
-    <div id="message">Kattints az "Osztás" gombra a kezdéshez!</div>
-
-    <div class="controls">
-        <button id="deal-btn" onclick="deal()">Osztás</button>
-        <button id="hit-btn" onclick="hit()" disabled>Húz</button>
-        <button id="stand-btn" onclick="stand()" disabled>Megáll</button>
+    <div class="action-buttons">
+        <button id="spin-btn" onclick="spin()" disabled>Pörgetés (0 $)</button>
+        <button id="clear-btn" onclick="clearBets()" disabled>Tétek Törlése</button>
     </div>
 </div>
 
 <script>
-    // ** A JÁTÉK JAVASCRIPT LOGIKÁJA UGYANAZ MARADT **
-    let deck = [];
-    let playerHand = [];
-    let dealerHand = [];
-    let gameActive = false;
+    // --- JÁTÉK ÁLLAPOT VÁLTOZÓK ---
+    let balance = 5000;
+    let currentBet = {}; // { 'cell-id': amount }
+    let selectedChipValue = 1;
 
-    const dealerScoreDisplay = document.getElementById('dealer-score');
-    const playerScoreDisplay = document.getElementById('player-score');
-    const dealerCardsDisplay = document.getElementById('dealer-cards');
-    const playerCardsDisplay = document.getElementById('player-cards');
-    const messageDisplay = document.getElementById('message');
-    
-    const dealBtn = document.getElementById('deal-btn');
-    const hitBtn = document.getElementById('hit-btn');
-    const standBtn = document.getElementById('stand-btn');
+    // --- DOM ELEMEK ---
+    const balanceDisplay = document.getElementById('balance');
+    const resultDisplay = document.getElementById('result');
+    const chipElements = document.querySelectorAll('.chip');
+    const spinBtn = document.getElementById('spin-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const betAmountSpans = document.querySelectorAll('.bet-amount');
 
-    function createDeck() {
-        const cards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        let newDeck = [];
-        for (let i = 0; i < 4; i++) {
-            newDeck = newDeck.concat(cards);
-        }
-        return newDeck;
-    }
+    // Rulett színek (szükséges a kifizetésekhez)
+    const ROULETTE_COLORS = {
+        0: 'green', 1: 'red', 2: 'black', 3: 'red', 4: 'black', 5: 'red', 6: 'black',
+        7: 'red', 8: 'black', 9: 'red', 10: 'black', 11: 'black', 12: 'red',
+        13: 'black', 14: 'red', 15: 'black', 16: 'red', 17: 'black', 18: 'red',
+        19: 'red', 20: 'black', 21: 'red', 22: 'black', 23: 'red', 24: 'black',
+        25: 'red', 26: 'black', 27: 'red', 28: 'black', 29: 'black', 30: 'red',
+        31: 'black', 32: 'red', 33: 'black', 34: 'red', 35: 'black', 36: 'red'
+    };
 
-    function getCardValue(card) {
-        if (['J', 'Q', 'K'].includes(card)) {
-            return 10;
-        }
-        if (card === 'A') {
-            return 11;
-        }
-        return parseInt(card);
-    }
+    // --- FUNKCIÓK ---
 
-    function calculateScore(hand) {
-        let score = 0;
-        let aceCount = 0;
+    /**
+     * Frissíti a kijelzőt
+     */
+    function updateDisplay() {
+        balanceDisplay.textContent = `$${balance}`;
+        let totalBet = 0;
         
-        for (const card of hand) {
-            score += getCardValue(card);
-            if (card === 'A') {
-                aceCount++;
+        // Összes tét frissítése és tétek megjelenítése a cellákon
+        betAmountSpans.forEach(span => {
+            const betId = span.dataset.betId;
+            const betAmount = currentBet[betId] || 0;
+            totalBet += betAmount;
+            span.textContent = betAmount > 0 ? `$${betAmount}` : '';
+            // Elrejtjük, ha nincs tét
+            span.style.display = betAmount > 0 ? 'block' : 'none';
+
+            // Kiemeljük a tételt cellát
+            const cellElement = document.getElementById(`cell-${betId}`);
+            if (cellElement) {
+                cellElement.style.border = betAmount > 0 ? `3px solid var(--secondary)` : `1px solid var(--card-border)`;
             }
-        }
-        
-        while (score > 21 && aceCount > 0) {
-            score -= 10;
-            aceCount--;
-        }
-        return score;
+        });
+
+        spinBtn.textContent = `Pörgetés (${totalBet} $)`;
+        spinBtn.disabled = totalBet === 0 || balance === 0;
+        clearBtn.disabled = totalBet === 0;
     }
 
-    function shuffleDeck(deck) {
-        for (let i = deck.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [deck[i], deck[j]] = [deck[j], deck[i]];
-        }
-    }
-
-    function drawCard() {
-        if (deck.length === 0) {
-            deck = createDeck();
-            shuffleDeck(deck);
-        }
-        return deck.pop();
-    }
-
-    function renderCards(hand, displayElement, isDealer = false, isGameOver = false) {
-        displayElement.innerHTML = '';
-        hand.forEach((card, index) => {
-            const cardDiv = document.createElement('div');
-            cardDiv.classList.add('card');
-            
-            if (isDealer && index === 0 && !isGameOver) {
-                cardDiv.classList.add('hidden');
-                cardDiv.textContent = '🃏';
-            } else {
-                cardDiv.textContent = card;
-                // A lapok színeit pirosra állítjuk (fekete helyett) a jobb kontraszt érdekében a fehér kártyán
-                if (['10', 'J', 'Q', 'K'].includes(card) || card === 'A') {
-                    // Ha a kártya 10-es értékű, piros színnel
-                    cardDiv.style.color = 'var(--accent)'; 
-                }
+    /**
+     * Zseton választása
+     */
+    function selectChip(value) {
+        selectedChipValue = value;
+        chipElements.forEach(chip => {
+            chip.classList.remove('active');
+            if (parseInt(chip.dataset.value) === value) {
+                chip.classList.add('active');
             }
-            displayElement.appendChild(cardDiv);
         });
     }
 
-    function updateScores(isGameOver = false) {
-        const playerScore = calculateScore(playerHand);
-        playerScoreDisplay.textContent = playerScore;
+    /**
+     * Tét elhelyezése
+     */
+    function placeBet(cellId) {
+        if (balance < selectedChipValue) {
+            resultDisplay.textContent = "Nincs elegendő pénz a tételhez!";
+            return;
+        }
 
-        if (isGameOver) {
-            dealerScoreDisplay.textContent = calculateScore(dealerHand);
-        } else {
-            if (dealerHand.length > 1) {
-                // Csak a felfordított kártya értékét mutatjuk a játék elején
-                dealerScoreDisplay.textContent = getCardValue(dealerHand[1]);
-            } else {
-                dealerScoreDisplay.textContent = 0;
+        // Tét elhelyezése (hozzáadja a már meglévőhöz)
+        currentBet[cellId] = (currentBet[cellId] || 0) + selectedChipValue;
+        
+        // Levonás az egyenlegből pörgetéskor történik, itt csak ellenőrizzük a limitemet
+        
+        resultDisplay.textContent = `${cellId} tét: +$${selectedChipValue}.`;
+        updateDisplay();
+    }
+    
+    /**
+     * Tétek törlése
+     */
+    function clearBets() {
+        // Visszaadjuk a pénzt az egyenlegbe, mivel pörgetés előtt tettük rá
+        let totalBet = 0;
+        for (const bet in currentBet) {
+            totalBet += currentBet[bet];
+        }
+        balance += totalBet; // Visszaadjuk a korábbi téteket
+        
+        currentBet = {}; // Tétek törlése
+        resultDisplay.textContent = `Összesen ${totalBet} $ tét törölve.`;
+        
+        // Tábla kijelölések törlése
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.classList.remove('winner');
+        });
+
+        updateDisplay();
+    }
+
+    /**
+     * Nyertes szám és kifizetés kiszámítása
+     */
+    function calculateWinnings(winningNumber) {
+        let totalWinnings = 0;
+        const winningNumberStr = winningNumber.toString();
+        const winningColor = ROULETTE_COLORS[winningNumber];
+        const isEven = winningNumber !== 0 && winningNumber % 2 === 0;
+
+        // Eltávolítja az előző nyertes kiemelést
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.classList.remove('winner');
+        });
+        
+        // Eltávolítja az előző tétek összététét az egyenlegből
+        let totalBet = 0;
+        for (const bet in currentBet) {
+            totalBet += currentBet[bet];
+        }
+        balance -= totalBet; // Levonjuk a pörgetés előtt megtett téteket
+
+        // --- KIFIZETÉS ELLENŐRZÉSE ---
+        for (const bet in currentBet) {
+            const betAmount = currentBet[bet];
+            let payout = 0;
+
+            // 1. Straight Up (Egyedi szám) - 35:1
+            if (bet === winningNumberStr) {
+                payout = betAmount * 35;
+                totalWinnings += payout + betAmount; // Visszafizeti a tétet is
+            } 
+            // 2. Szín (Red/Black) - 1:1
+            else if (bet === 'red' && winningColor === 'red') {
+                payout = betAmount;
+                totalWinnings += payout + betAmount;
+            } else if (bet === 'black' && winningColor === 'black') {
+                payout = betAmount;
+                totalWinnings += payout + betAmount;
             }
+            // 3. Páros/Páratlan (Even/Odd) - 1:1
+            else if (bet === 'even' && isEven) {
+                payout = betAmount;
+                totalWinnings += payout + betAmount;
+            } else if (bet === 'odd' && !isEven && winningNumber !== 0) {
+                payout = betAmount;
+                totalWinnings += payout + betAmount;
+            }
+            // A 0-ra tett tét (ha lenne) már az Straight Up ellenőrzésnél megtörténik.
+        }
+
+        // Nyertes szám kiemelése
+        const winnerCell = document.getElementById(`cell-${winningNumberStr}`);
+        if (winnerCell) {
+            winnerCell.classList.add('winner');
+        }
+
+        return totalWinnings;
+    }
+
+    /**
+     * Pörgetés indítása
+     */
+    function spin() {
+        if (Object.keys(currentBet).length === 0) {
+            resultDisplay.textContent = "Tegyél tétet a pörgetés előtt!";
+            return;
         }
         
-        renderCards(playerHand, playerCardsDisplay);
-        renderCards(dealerHand, dealerCardsDisplay, true, isGameOver);
-    }
-
-    function checkWinner() {
-        const playerScore = calculateScore(playerHand);
-        const dealerScore = calculateScore(dealerHand);
-
-        gameActive = false;
-        hitBtn.disabled = true;
-        standBtn.disabled = true;
-        dealBtn.disabled = false;
-        dealBtn.textContent = 'Újra';
-
-        updateScores(true);
-
-        if (playerScore > 21) {
-            messageDisplay.textContent = `Veszítettél! Túllépted a 21-et (${playerScore}).`;
-        } else if (dealerScore > 21) {
-            messageDisplay.textContent = `Nyertél! Az Osztó túllépte a 21-et (${dealerScore})!`;
-        } else if (playerScore === 21 && playerHand.length === 2 && dealerScore !== 21) {
-             messageDisplay.textContent = `BLACKJACK! Nyertél!`;
-        } else if (playerScore > dealerScore) {
-            messageDisplay.textContent = `Nyertél! (${playerScore} vs ${dealerScore})`;
-        } else if (dealerScore > playerScore) {
-            messageDisplay.textContent = `Veszítettél! (${playerScore} vs ${dealerScore})`;
-        } else {
-            messageDisplay.textContent = `Döntetlen! (${playerScore} vs ${dealerScore})`;
-        }
-    }
-
-    function deal() {
-        if (gameActive) return;
-
-        deck = createDeck();
-        shuffleDeck(deck);
-        playerHand = [];
-        dealerHand = [];
-        gameActive = true;
+        // Gombok letiltása pörgetés alatt
+        spinBtn.disabled = true;
+        clearBtn.disabled = true;
         
-        playerHand.push(drawCard(), drawCard());
-        dealerHand.push(drawCard(), drawCard());
+        resultDisplay.textContent = "A kerék forog...";
 
-        messageDisplay.textContent = 'Játékban vagy. Húzol, vagy megállsz?';
-        dealBtn.disabled = true;
-        hitBtn.disabled = false;
-        standBtn.disabled = false;
+        // Szimulált pörgetés: 0 és 36 közötti véletlen szám
+        const winningNumber = Math.floor(Math.random() * 37); // 0-36
 
-        updateScores();
-        
-        if (calculateScore(playerHand) === 21) {
-            stand();
-        }
+        // Szimulált animáció (egyszerű setTimeout)
+        setTimeout(() => {
+            const winnings = calculateWinnings(winningNumber);
+            balance += winnings;
+
+            const profit = winnings - (Object.keys(currentBet).reduce((sum, key) => sum + currentBet[key], 0));
+            
+            let message = `🔴 Nyertes szám: **${winningNumber}** (${ROULETTE_COLORS[winningNumber].toUpperCase()})! `;
+            if (winnings > 0) {
+                 message += `**NYERTÉL** $${profit} profitot! (Összesen: $${winnings})`;
+            } else {
+                 message += `Veszítettél. Próbálj újra!`;
+            }
+
+            resultDisplay.innerHTML = message;
+            currentBet = {}; // Tétek törlése a következő körre
+
+            updateDisplay();
+        }, 1500); // 1.5 másodperces szimulált pörgetési idő
     }
 
-    function hit() {
-        if (!gameActive) return;
+    // --- KEZDETI ÁLLAPOT ---
+    updateDisplay();
+    selectChip(1); // Kezdő zseton $1
 
-        playerHand.push(drawCard());
-        updateScores();
-
-        if (calculateScore(playerHand) > 21) {
-            checkWinner();
-        }
-    }
-
-    function stand() {
-        if (!gameActive) return;
-        
-        // Osztó köre: húz, amíg el nem éri a 17-et
-        while (calculateScore(dealerHand) < 17) {
-            dealerHand.push(drawCard());
-        }
-
-        checkWinner();
-    }
-
-    updateScores(); 
 </script>
 
 </body>
 </html>
-
