@@ -872,3 +872,138 @@ section[id],
   color: var(--text-muted);
   line-height: 1.8;
 }
+
+/* Útmutató stílusok */
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.guide-card {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.guide-card.reverse {
+  flex-direction: row-reverse;
+}
+
+.guide-content {
+  flex: 1;
+  padding: 40px;
+}
+
+.guide-image {
+  flex: 0 0 40%; /* A kép csak a kártya szélességének 40%-át foglalja el */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px; /* Egy kis belső margó, hogy ne érjen a széléhez a kép */
+  background-color: rgba(0, 0, 0, 0.1); /* Enyhe háttér a kép alatt */
+}
+
+.guide-image img {
+  width: 100%;
+  max-width: 350px; /* Maximális szélesség, hogy ne nőjön túl nagyra */
+  height: auto;
+  border-radius: 8px; /* Lekerekített sarkok a képnek is */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Egy kis mélység a képnek */
+  transition: transform 0.3s ease;
+}
+
+.guide-image img:hover {
+  transform: scale(1.02);
+}
+
+.step-number {
+  background-color: var(--secondary);
+  color: white;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Mobil nézet az útmutatónak */
+@media (max-width: 768px) {
+  .guide-card, .guide-card.reverse {
+    flex-direction: column;
+  }
+  
+  .guide-content {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .guide-image {
+    flex: 1;
+    width: 100%;
+    padding: 10px;
+  }
+  
+  .guide-image img {
+    max-width: 100%; /* Mobilon kitöltheti a rendelkezésre álló helyet */
+  }
+}
+
+/* Lightbox alapstílus */
+.lightbox {
+  display: none; /* Alapértelmezetten rejtve */
+  position: fixed;
+  z-index: 2000; /* Minden felett legyen */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9); /* Sötét háttér */
+  justify-content: center;
+  align-items: center;
+}
+
+/* A nagyított kép stílusa */
+.lightbox-content {
+  max-width: 90%;
+  max-height: 85%;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  animation: zoomIn 0.3s ease;
+}
+
+/* Bezáró gomb (X) */
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 35px;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.lightbox-close:hover {
+  color: var(--secondary);
+}
+
+/* Kicsi nagyítás animáció */
+@keyframes zoomIn {
+  from {transform: scale(0.8); opacity: 0;}
+  to {transform: scale(1); opacity: 1;}
+}
+
+/* Mutató ujj a kattintható képeknél */
+.guide-image img {
+  cursor: zoom-in;
+}
