@@ -128,3 +128,30 @@ window.addEventListener('scroll', () => {
 });
 
 setActiveNavLink();
+
+document.addEventListener('DOMContentLoaded', function() {
+  const lightbox = document.getElementById('imageLightbox');
+  const largeImg = document.getElementById('largeImage');
+  const closeBtn = document.querySelector('.lightbox-close');
+  const images = document.querySelectorAll('.guide-image img');
+
+  // Ha egy képre kattintunk
+  images.forEach(img => {
+    img.addEventListener('click', () => {
+      lightbox.style.display = 'flex';
+      largeImg.src = img.src; // Átmásoljuk a kép forrását a nagyítóba
+    });
+  });
+
+  // Bezárás az X gombra kattintva
+  closeBtn.addEventListener('click', () => {
+    lightbox.style.display = 'none';
+  });
+
+  // Bezárás, ha a sötét háttérre kattintunk
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) {
+      lightbox.style.display = 'none';
+    }
+  });
+});
